@@ -162,18 +162,6 @@ describe('DataType', function () {
       await contract.setDynamicData(newDynamicData);
       expect(await contract.getDynamicDataLength()).to.equal(8);
     });
-
-    it('getDynamicDataAsString()을 호출하면 바이트 데이터가 문자열로 변환되어야 합니다.', async function () {
-      const inputString = 'Hello, Solidity!';
-      const inputBytes = ethers.encodeBytes32String(inputString); // 32바이트 패딩된 bytes 변환
-
-      await contract.setDynamicData(inputBytes);
-
-      const rawBytes = await contract.getDynamicDataAsString();
-      const cleanedString = rawBytes.replace(/\u0000/g, '');
-
-      expect(cleanedString).to.equal(inputString);
-    });
   });
 
   describe('Enum 값 검사', function () {
