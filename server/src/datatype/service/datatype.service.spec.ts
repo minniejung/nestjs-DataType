@@ -15,6 +15,8 @@ const mockEthersService = {
   fixedData: jest.fn().mockResolvedValue('0xabcdef'),
   setFixedData: jest.fn().mockResolvedValue('0xdeadbeef'),
   zeroPadValue32: jest.fn().mockResolvedValue('0x0000deadbeef'),
+  encodeBytes32String: jest.fn().mockResolvedValue('0xencodedhello'),
+  isBytesLike: jest.fn((data) => Promise.resolve(data.startsWith('0x'))),
   dynamicData: jest.fn().mockResolvedValue('0x1234'),
   setDynamicData: jest.fn().mockResolvedValue('0xcafe'),
   getDynamicDataLength: jest.fn().mockResolvedValue(8),
@@ -47,83 +49,84 @@ describe('DatatypeService', () => {
   });
 
   it('positive 값이 없으면 positiveNumber를 반환해야 합니다.', async () => {
-    const result = await service.positive();
-    expect(result).toBe(100);
+    expect(await service.positive()).toBe(100);
   });
 
   it('positive 값이 있으면 setPositiveNumber 실행 후 결과를 반환해야 합니다.', async () => {
-    const result = await service.positive(200);
-    expect(result).toBe(200);
+    expect(await service.positive(200)).toBe(200);
   });
 
   it('negative 값이 없으면 negativeNumber 반환해야 합니다.', async () => {
-    const result = await service.negative();
-    expect(result).toBe(-50);
+    expect(await service.negative()).toBe(-50);
   });
 
   it('negative 값이 있으면 setNegativeNumber 실행 후 결과를 반환해야 합니다.', async () => {
-    const result = await service.negative(-100);
-    expect(result).toBe(-100);
+    expect(await service.negative(-100)).toBe(-100);
   });
 
   it('활성 상태 조회 (isActive)를 조회해야 합니다.', async () => {
-    const result = await service.isActive();
-    expect(result).toBe(true);
+    expect(await service.isActive()).toBe(true);
   });
 
   it('활성 상태 토글 (toggleActive)이 작동해야 합니다.', async () => {
-    const result = await service.toggleActive();
-    expect(result).toBe(false);
+    expect(await service.toggleActive()).toBe(false);
   });
 
   it('recipient 실행 시 recipient를 조회해야 합니다.', async () => {
-    const result = await service.recipient();
-    expect(result).toBe('0xRecipient');
+    expect(await service.recipient()).toBe('0xRecipient');
   });
 
   it('wallet address가 없을 경우 wallet를 조회해야 합니다.', async () => {
-    const result = await service.wallet();
-    expect(result).toBe('0xWallet');
+    expect(await service.wallet()).toBe('0xWallet');
   });
 
   it('wallet address가 있으면 setWallet 실행 후 결과를 반환해야 합니다.', async () => {
-    const result = await service.wallet('0xNewWallet');
-    expect(result).toBe('0xNewWallet');
+    expect(await service.wallet('0xNewWallet')).toBe('0xNewWallet');
   });
 
-  it('fixedData 값이 없을 경우 fixedData를 조회해야 합니다.', async () => {
-    const result = await service.fixedData();
-    expect(result).toBe('0xabcdef');
+  it('fixedData data값이 없을 경우 fixedData를 조회해야 합니다.', async () => {
+    expect(await service.fixedData()).toBe('0xabcdef');
   });
 
-  it('fixedData 값이 있으면 패딩 후 setFixedData를 실행해야 합니다.', async () => {
+  it('fixedData data값이 바이트 형이면 padding 후 실행해야 합니다.', async () => {
     const result = await service.fixedData('0xdeadbeef');
+    expect(mockEthersService.zeroPadValue32).toHaveBeenCalledWith('0xdeadbeef');
+    expect(mockEthersService.setFixedData).toHaveBeenCalledWith(
+      '0x0000deadbeef'
+    );
+    expect(result).toBe('0xdeadbeef');
+  });
+
+  it('fixedData의 data가 바이트 형이 아니어도 실행되어야 합니다.', async () => {
+    const result = await service.fixedData('hello');
+    expect(mockEthersService.encodeBytes32String).toHaveBeenCalledWith('hello');
+    expect(mockEthersService.zeroPadValue32).toHaveBeenCalledWith(
+      '0xencodedhello'
+    );
+    expect(mockEthersService.setFixedData).toHaveBeenCalledWith(
+      '0x0000deadbeef'
+    );
     expect(result).toBe('0xdeadbeef');
   });
 
   it('dynamicData 값이 없을 경우 dynamicData를 조회해야 합니다.', async () => {
-    const result = await service.dynamicData();
-    expect(result).toBe('0x1234');
+    expect(await service.dynamicData()).toBe('0x1234');
   });
 
   it('dynamicData 값이 있으면 setDynamicData 실행 후 결과를 반환해야 합니다.', async () => {
-    const result = await service.dynamicData('0xcafe');
-    expect(result).toBe('0xcafe');
+    expect(await service.dynamicData('0xcafe')).toBe('0xcafe');
   });
 
   it('getDynamicDataLength 실행 시 dynamicData 길이를 조회해야 합니다.', async () => {
-    const result = await service.getDynamicDataLength();
-    expect(result).toBe(8);
+    expect(await service.getDynamicDataLength()).toBe(8);
   });
 
   it('state 값이 없으면 currentState를 조회해야 합니다.', async () => {
-    const result = await service.currentState();
-    expect(result).toBe(1);
+    expect(await service.currentState()).toBe(1);
   });
 
   it('state 값이 있으면 setState 실행 후 결과를 반환해야 합니다.', async () => {
-    const result = await service.currentState(2);
-    expect(result).toBe(2);
+    expect(await service.currentState(2)).toBe(2);
   });
 
   it('getDetails 실행 시 bigint 타입이 문자열로 변환되어야 합니다.', async () => {

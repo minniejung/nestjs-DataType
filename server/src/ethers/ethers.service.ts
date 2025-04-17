@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { ethers, zeroPadValue, toUtf8String } from 'ethers';
+import { ethers, zeroPadValue, encodeBytes32String, isBytesLike } from 'ethers';
 import { abi, address } from '../../abis/DataType.json';
 
 @Injectable()
@@ -20,6 +20,14 @@ export class EthersService {
 
   async zeroPadValue32(data: string) {
     return zeroPadValue(data, 32);
+  }
+
+  async encodeBytes32String(data: string) {
+    return encodeBytes32String(data);
+  }
+
+  async isBytesLike(data: string) {
+    return isBytesLike(data);
   }
 
   // 위 코드는 지우지 마세요.

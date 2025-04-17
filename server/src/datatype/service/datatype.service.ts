@@ -55,10 +55,12 @@ export class DatatypeService {
 
   async fixedData(data?: string) {
     try {
-      // Todo: data 유무에 따라 fixedData과 setFixedData의 값을 리턴합니다.
+      // Todo: data 유무에 따라 getFixedData와 setFixedData의 값을 리턴합니다.
+      // ⚠️ data가 byte 형의 데이터인지 확인해야 합니다.(isBytesLike)
+      // ⚠️ (byte형이 아닐 시) string -> bytes32(encodeBytes32String)
       // ⚠️ data의 길이는 32바이트로 패딩해야 합니다.(zeroPadValue32)
     } catch (error) {
-      console.error(error);
+      console.log(error);
     }
   }
 
