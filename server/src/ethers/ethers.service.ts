@@ -1,6 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { ethers, zeroPadValue, encodeBytes32String, isBytesLike } from 'ethers';
+import {
+  ethers,
+  zeroPadValue,
+  encodeBytes32String,
+  isBytesLike,
+  toUtf8Bytes,
+  BytesLike,
+} from 'ethers';
 import { abi, address } from '../../abis/DataType.json';
 
 @Injectable()
@@ -24,6 +31,10 @@ export class EthersService {
 
   async encodeBytes32String(data: string) {
     return encodeBytes32String(data);
+  }
+
+  async toUtf8Bytes(data: string): Promise<Uint8Array> {
+    return toUtf8Bytes(data);
   }
 
   async isBytesLike(data: string) {
@@ -85,7 +96,7 @@ export class EthersService {
     // Todo: dynamicData의 값을 리턴합니다.
   }
 
-  async setDynamicData(data: string) {
+  async setDynamicData(data: BytesLike) {
     // Todo: setDynamicData의 값을 리턴합니다.
     // ⚠️ setter함수는 tx 확정 후 영수증을 리턴합니다.(wait)
   }
