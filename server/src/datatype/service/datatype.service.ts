@@ -66,7 +66,9 @@ export class DatatypeService {
 
   async dynamicData(data?: string) {
     try {
-      // Todo: data 유무에 따라 dynamicData과 setDynamicData의 값을 리턴합니다.
+      // Todo: data 유무에 따라 dynamicData와 setDynamicData의 값을 리턴합니다.
+      // ⚠️ data가 byte 형의 데이터인지 확인해야 합니다.(isBytesLike)
+      // ⚠️ (byte형이 아닐 시) string -> bytes(toUtf8Bytes)
     } catch (error) {
       console.error(error);
     }

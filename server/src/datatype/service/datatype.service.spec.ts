@@ -16,6 +16,9 @@ const mockEthersService = {
   setFixedData: jest.fn().mockResolvedValue('0xdeadbeef'),
   zeroPadValue32: jest.fn().mockResolvedValue('0x0000deadbeef'),
   encodeBytes32String: jest.fn().mockResolvedValue('0xencodedhello'),
+  toUtf8Bytes: jest
+    .fn()
+    .mockResolvedValue(new Uint8Array([0x68, 0x65, 0x6c, 0x6c, 0x6f])),
   isBytesLike: jest.fn((data) => Promise.resolve(data.startsWith('0x'))),
   dynamicData: jest.fn().mockResolvedValue('0x1234'),
   setDynamicData: jest.fn().mockResolvedValue('0xcafe'),
@@ -115,6 +118,21 @@ describe('DatatypeService', () => {
 
   it('dynamicData 값이 있으면 setDynamicData 실행 후 결과를 반환해야 합니다.', async () => {
     expect(await service.dynamicData('0xcafe')).toBe('0xcafe');
+  });
+
+  it('dynamicData의 값이 바이트 형이 아니면 변환 후 setDynamicData 실행되어야 합니다.', async () => {
+    mockEthersService.isBytesLike.mockResolvedValueOnce(false);
+    mockEthersService.toUtf8Bytes = jest
+      .fn()
+      .mockResolvedValue(new Uint8Array([0x68, 0x65, 0x6c, 0x6c, 0x6f]));
+
+    const result = await service.dynamicData('hello');
+
+    expect(mockEthersService.toUtf8Bytes).toHaveBeenCalledWith('hello');
+    expect(mockEthersService.setDynamicData).toHaveBeenCalledWith(
+      new Uint8Array([0x68, 0x65, 0x6c, 0x6c, 0x6f])
+    );
+    expect(result).toBe('0xcafe');
   });
 
   it('getDynamicDataLength 실행 시 dynamicData 길이를 조회해야 합니다.', async () => {
